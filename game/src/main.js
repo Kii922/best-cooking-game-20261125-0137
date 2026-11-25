@@ -4,6 +4,7 @@
 import { VIEW_W, VIEW_H, SHIFT_SECONDS } from './config.js';
 import { createGame, tick, spawnOrder } from './state.js';
 import { drawKitchen } from './render.js';
+import { drawChef, chefPose } from './chef.js';
 import { drawHeader, drawOrders, drawHintBar, drawPopups, drawTitle, drawPaused, drawGameOver } from './hud.js';
 import { attachInput } from './input.js';
 import { stageShot } from './shots.js';
@@ -33,8 +34,11 @@ function render() {
   drawOrders(ctx, game, mouse);
   drawHintBar(ctx, game);
   drawPopups(ctx, game);
-  if (game.screen === 'title') drawTitle(ctx, game);
-  else if (game.screen === 'paused') drawPaused(ctx);
+  if (game.screen === 'title') {
+    drawTitle(ctx, game);
+    // the chef welcomes the player beside the title panel
+    drawChef(ctx, 130, 648, 0.95, 'wave', game.elapsed);
+  } else if (game.screen === 'paused') drawPaused(ctx);
   else if (game.screen === 'over') drawGameOver(ctx, game);
 }
 
@@ -108,6 +112,23 @@ function selfTest() {
     g5.screen = 'playing';
     tick(g5, SHIFT_SECONDS + 1);
     ok('shift ends', g5.screen === 'over');
+
+    // chef poses follow the kitchen state
+    const g6 = createGame(12);
+    g6.screen = 'playing';
+    ok('chef idle with empty kitchen', chefPose(g6) === 'idle');
+    g6.board.chopping = true;
+    ok('chef chops at the board', chefPose(g6) === 'chop');
+    g6.board.chopping = false;
+    pickUp(g6, 'patty');
+    useGrill(g6);
+    ok('chef grills at the grill', chefPose(g6) === 'grill');
+    g6.grill.item = null;
+    g6.grill.cooking = false;
+    g6.plates[0].items = ['lettuce', 'tomatoChopped'];
+    spawnOrder(g6);
+    g6.orders[0].recipe = 'salad';
+    ok('chef celebrates a ready dish', chefPose(g6) === 'serve');
   } catch (err) {
     lines.push(`FAIL exception: ${err.message}`);
   }

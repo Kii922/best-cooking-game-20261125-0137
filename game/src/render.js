@@ -2,6 +2,7 @@
 // One job: draw the kitchen itself on the canvas. HUD and screens live in hud.js.
 
 import { COLORS, ITEMS, BINS, BIN_W, BIN_H, BIN_Y, STATIONS, PLATES, VIEW_W } from './config.js';
+import { drawChef, chefPose } from './chef.js';
 
 export function roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath();
@@ -186,6 +187,9 @@ export function drawKitchen(ctx, game, mouse) {
   drawPot(ctx, game, mouse);
   drawTrash(ctx, game, mouse);
   drawPlates(ctx, game, mouse);
+  // the chef works the pass between the two plates — except on the title
+  // screen, where the waving chef beside the panel is drawn instead
+  if (game.screen !== 'title') drawChef(ctx, 640, 648, 1, chefPose(game), game.elapsed);
   drawHands(ctx, game, mouse);
 }
 
