@@ -32,6 +32,7 @@ export function createGame(seed) {
       { id: 'B', items: [] },
     ],
     popups: [], // { x, y, text, color, born, life }
+    lastServeAt: null, // elapsed time of the latest serve (the waiter carries off)
     shake: 0, // ticket shake timer for a failed serve
     message: '', // hint line for the player
     messageBorn: 0,
@@ -91,6 +92,7 @@ export function serveOrder(game, order) {
   game.popups.push({
     x: 640, y: 200, text: `+${points}`, color: '#2c7a3a', born: game.elapsed, life: 1.4,
   });
+  game.lastServeAt = game.elapsed;
   return { points, plate };
 }
 

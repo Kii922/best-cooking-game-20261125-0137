@@ -92,6 +92,7 @@ export function stageShot(name, seed) {
     game.grill.item = 'pattyGrilled';
     game.grill.progress = 1;
     game.plates[0].items = ['bun', 'pattyGrilled', 'cheese', 'lettuce'];
+    game.lastServeAt = 91; // a serve just happened — the waiter carries it off
     game.popups.push({ x: 640, y: 200, text: '+264', color: '#2c7a3a', born: 92, life: 99 });
     game.message = 'Burger complete — click its ticket to serve it now!';
     return game;

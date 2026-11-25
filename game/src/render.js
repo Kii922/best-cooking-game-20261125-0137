@@ -3,6 +3,7 @@
 
 import { COLORS, ITEMS, BINS, BIN_W, BIN_H, BIN_Y, STATIONS, PLATES, VIEW_W } from './config.js';
 import { drawChef, chefPose } from './chef.js';
+import { drawWaiter, drawHelper, waiterPose, helperPose } from './staff.js';
 
 export function roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath();
@@ -190,6 +191,14 @@ export function drawKitchen(ctx, game, mouse) {
   // the chef works the pass between the two plates — except on the title
   // screen, where the waving chef beside the panel is drawn instead
   if (game.screen !== 'title') drawChef(ctx, 640, 648, 1, chefPose(game), game.elapsed);
+  // the staff work the ends of the plates row: the prep cook at the left,
+  // the waiter at the right pass. On the title screen the waiter stands by
+  // at the right (drawn in main.js, bright beside the panel); the prep cook
+  // stays in the back, so he is hidden there.
+  if (game.screen !== 'title') {
+    drawHelper(ctx, 95, 648, 0.9, helperPose(game), game.elapsed);
+    drawWaiter(ctx, 1185, 648, 0.9, waiterPose(game), game.elapsed);
+  }
   drawHands(ctx, game, mouse);
 }
 

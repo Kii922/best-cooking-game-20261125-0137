@@ -5,6 +5,7 @@ import { VIEW_W, VIEW_H, SHIFT_SECONDS } from './config.js';
 import { createGame, tick, spawnOrder } from './state.js';
 import { drawKitchen } from './render.js';
 import { drawChef, chefPose } from './chef.js';
+import { drawWaiter, waiterPose, helperPose } from './staff.js';
 import { drawHeader, drawOrders, drawHintBar, drawPopups, drawTitle, drawPaused, drawGameOver } from './hud.js';
 import { attachInput } from './input.js';
 import { stageShot } from './shots.js';
@@ -38,6 +39,8 @@ function render() {
     drawTitle(ctx, game);
     // the chef welcomes the player beside the title panel
     drawChef(ctx, 130, 648, 0.95, 'wave', game.elapsed);
+    // the waiter stands by at the right, tray down
+    drawWaiter(ctx, 1185, 648, 0.9, 'idle', game.elapsed);
   } else if (game.screen === 'paused') drawPaused(ctx);
   else if (game.screen === 'over') drawGameOver(ctx, game);
 }
@@ -129,6 +132,26 @@ function selfTest() {
     spawnOrder(g6);
     g6.orders[0].recipe = 'salad';
     ok('chef celebrates a ready dish', chefPose(g6) === 'serve');
+
+    // staff poses follow the kitchen state
+    const g7 = createGame(13);
+    g7.screen = 'playing';
+    ok('waiter idle with empty kitchen', waiterPose(g7) === 'idle');
+    ok('helper idle with empty kitchen', helperPose(g7) === 'idle');
+    g7.board.chopping = true;
+    ok('helper chops at the board', helperPose(g7) === 'chop');
+    g7.board.chopping = false;
+    pickUp(g7, 'pasta');
+    usePot(g7);
+    ok('helper stirs at the pot', helperPose(g7) === 'stir');
+    g7.pot.item = null;
+    g7.pot.cooking = false;
+    g7.plates[0].items = ['lettuce', 'tomatoChopped'];
+    spawnOrder(g7);
+    g7.orders[0].recipe = 'salad';
+    ok('waiter waits with tray up for a ready dish', waiterPose(g7) === 'ready');
+    clickTicket(g7, g7.orders[0]);
+    ok('waiter carries the dish off after a serve', waiterPose(g7) === 'carry');
   } catch (err) {
     lines.push(`FAIL exception: ${err.message}`);
   }
